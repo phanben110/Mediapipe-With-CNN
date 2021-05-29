@@ -8,11 +8,11 @@ cTime = 0
 video ="handBen2.mp4"
 video = '/home/pcwork/ai/ftech/finger/DatasetToHandVitual/helloVideo/hello_01'
 video = '/home/pcwork/depthai-python/examples/vaytay.avi' 
-video = 0
-video = 'rtsp://ftech:ad1235min@192.168.130.27/live0'
+#video = 'rtsp://ftech:ad1235min@192.168.130.27/live0'
 #video = '/home/pcwork/ai/ftech/finger/CNN/quang/My video - Ngày (2).mp4' 
+video = 2
+name = "hi2" 
 cap = cv2.VideoCapture(video)
-name = "like1" 
 try: 
     os.mkdir ("data") 
 except :
@@ -36,7 +36,7 @@ while True :
     # ben.findFingerUp(pointList)
     #print ( box  )
     #print ( pointList[0] )
-    print ( len ( box ) )
+    #print ( len ( box ) )
     if len ( box ) != 0 :
 
         cv2.rectangle( img , ( box[0] - 20 , box[1] - 20  ) , ( box[2] + 20 , box[3]+ 20  ) , (0,255,0),2 )
@@ -50,9 +50,13 @@ while True :
     pTime = cTime
     cv2.putText( img , str( int ( fps ) ) , (10,70) , cv2.FONT_HERSHEY_PLAIN,3, (255, 0, 255 ) ,3 )
     cv2.imshow("ben", img )
-    cv2.imwrite(f"data/{name}/{name}_{count}.jpg", img2 )
-    print ( f"data/{name}/{name}_{count}.jpg") 
-    count +=1 
+    if check and img2.size == 10000 :
+        cv2.imwrite(f"data/{name}/{name}_{count}.png", img2 )
+        img2 = cv2.flip(img2, 1 )
+        count +=1 
+        cv2.imwrite(f"data/{name}/{name}_{count}.png", img2 )
+        count += 1
+        #print ( f"data/{name}/{name}_{count}.jpg") 
     #if check  == True :
     #    cv2.imshow("image", img2  )
     #    cv2.imshow("ben1", img1)

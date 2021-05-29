@@ -59,7 +59,7 @@ class handLandmarks:
 
 
 
-    def storePoint( self, img  , handNo= 0 , draw=True ) :
+    def storePoint( self, img  , handNo= 0 , draw=False  ) :
         xList = []
         yList = []
         box = []
@@ -83,7 +83,7 @@ class handLandmarks:
 
 
 
-    def extractFeature(self , img , handNo = 0, draw=True ): 
+    def extractFeature(self , img , handNo = 0, draw=False ): 
         self.pointStore = ''
         xList = []
         yList = []
@@ -112,7 +112,7 @@ class handLandmarks:
         return self.pointStore
 
         
-    def drawAndResize(self , img , box , size = 120 , draw = True ):
+    def drawAndResize(self , img , box , size = 100 , draw = True ):
         import numpy
         img2 = numpy.ones((img.shape[0], img.shape[1], 3), numpy.uint8) * 0
         img3 = numpy.ones((size, size, 3), numpy.uint8) * 0
@@ -129,7 +129,7 @@ class handLandmarks:
             elif s < 3 :
                 s = 3
 
-            print (f"s: {s}" ) 
+            #print (f"s: {s}" ) 
 
             crop_img = img2[y-s:y + h + s , x-s:x + w + s ]
             #cv2.rectangle( img2 , ( box[0] - s , box[1] - s ) , ( box[2] + s , box[3]+ s  ) , (0,255,0),2 )
@@ -142,9 +142,9 @@ class handLandmarks:
             # resize 130 x 130
             k=1
             if w > h : 
-                k = w/100
+                k = w/96
             else :
-                k = h/100
+                k = h/96
 
             w1 = int ( w/k ) 
             h1 = int ( h/k ) 
@@ -157,12 +157,12 @@ class handLandmarks:
 
                 crop_img  = cv2.cvtColor(crop_img , cv2.COLOR_BGR2GRAY)
                 img3  = cv2.cvtColor(img3 , cv2.COLOR_BGR2GRAY)
-                crop_img = cv2.resize(crop_img , dim, interpolation = cv2.INTER_AREA)
+                crop_img = cv2.resize(crop_img , dim)
                 x_offset=int ( (size - crop_img.shape[0] )/2) 
                 y_offset=int ( (size - crop_img.shape[1] )/2)
                 #print ( y_offset ) 
                 img3[x_offset:crop_img.shape[0]+x_offset , y_offset:crop_img.shape[1]+y_offset] = crop_img
-                #print ( "ok ") 
+                #print ( img3.shape )  
 
                 return True , img2 , img3
             except :
@@ -243,7 +243,7 @@ if __name__ =="__main__" :
     video ="handBen2.mp4"
     video = '/home/pcwork/ai/ftech/finger/DatasetToHandVitual/helloVideo/hello_01'
 
-    #video = 0
+    video = 0
     #video = 'rtsp://ftech:ad1235min@192.168.130.27/live0'
     cap = cv2.VideoCapture(video)
     while True :
@@ -255,7 +255,7 @@ if __name__ =="__main__" :
         # ben.findFingerUp(pointList)
         #print ( box  )
         #print ( pointList[0] )
-        print ( len ( box ) )
+        #print ( len ( box ) )
         if len ( box ) != 0 :
 
             cv2.rectangle( img , ( box[0] - 20 , box[1] - 20  ) , ( box[2] + 20 , box[3]+ 20  ) , (0,255,0),2 )
