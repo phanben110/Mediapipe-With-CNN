@@ -9,7 +9,7 @@ import numpy as np
 
 DATASET_PATH = ".././data/raw" 
 
-JSON_PATH = ".././data/processed/dataHandSize50.json"
+JSON_PATH = ".././data/processed/dataHandSize26.json"
 
 labels = ["Ok", "Silent", "Dislike", "Like", "Hi" , "hello" , "stop" ] 
 
@@ -51,7 +51,7 @@ def preprocess_dataset(dataset_path, JSON_PATH ):
                 # load audio file and slice it to ensure length consistency among different files
                 print ( file_path )  
                 feature = cv2.imread( file_path , 0 ) 
-                feature = cv2.resize( feature , (50, 50)) 
+                feature = cv2.resize( feature , (26, 26)) 
 
                 print(feature.shape ) 
 

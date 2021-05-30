@@ -4,9 +4,9 @@ import cv2
 import os 
 import time 
 ben = finger.handLandmarks() 
-JSON_FILE = "modelTensorflow/model1.json"
+JSON_FILE = "modelTensorflow/model3.json"
 #WEIJSON_FILE = "jsonEyeModelV1.json"
-WEIGHTS_FILE = "modelTensorflow/model1.h5"
+WEIGHTS_FILE = "modelTensorflow/model3.h5"
 #GHTS_FILE = "eyeModelV1.h5"
 
 pTime = 0 
@@ -16,7 +16,7 @@ model = model.runModel( JSON_FILE, WEIGHTS_FILE )
 
 MODEL = model.wakeUpModel() 
 
-video = 0 
+video = 2 
 cap = cv2.VideoCapture( video ) 
 predict = ' ' 
 acc = 0 
@@ -37,12 +37,19 @@ while True :
     fps = 1/( cTime - pTime )
     pTime = cTime
     cv2.putText( img , f"Fps: {int(fps)}" , (6,50) , cv2.FONT_HERSHEY_PLAIN,2, (255, 0, 255 ) ,3 )
-    if check and img2.size == 10000 :
-        predict, acc  = model.getResult(img2, MODEL) 
-    try:
-        cv2.putText( img , f"Status: {predict} {int(acc*100)} %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
-    except :
-        cv2.putText( img , f"Status:        %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
+    if check and img2.size == 100*100 :
+        predict, acc  = model.getResult(img2, MODEL , size = 26)
+        if predict != False :
+            try:
+
+                cv2.putText( img , f"Status: {predict} {int(acc*100)} %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
+            except : 
+
+                cv2.putText( img , f"Status:          %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
+        else:
+            cv2.putText( img ,     f"Status:          %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
+    else : 
+        cv2.putText( img ,         f"Status:          %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
     cv2.imshow("image", img)
     if cv2.waitKey(1) == 27:
         break

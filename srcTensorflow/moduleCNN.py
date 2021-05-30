@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 import tensorflow.keras as keras
 import matplotlib.pyplot as plt
 
-DATA_PATH = ".././data/processed/dataHandSize50.json"
+DATA_PATH = ".././data/processed/dataHandSize26.json"
 #DATA_PATH = '/home/ben/ai/audio/audioEdge/source/version1/dataControlV3.json'
 
 
@@ -94,9 +94,9 @@ def build_model(input_shape):
     model.add(keras.layers.BatchNormalization())
 
     # 2nd conv layer
-    model.add(keras.layers.Conv2D(32, (3, 3), activation='relu'))
-    model.add(keras.layers.MaxPooling2D((3, 3), strides=(2, 2), padding='same'))
-    model.add(keras.layers.BatchNormalization())
+    #model.add(keras.layers.Conv2D(32, (3, 3), activation='relu'))
+    #model.add(keras.layers.MaxPooling2D((3, 3), strides=(2, 2), padding='same'))
+    #model.add(keras.layers.BatchNormalization())
 
     # 3rd conv layer
     model.add(keras.layers.Conv2D(32, (2, 2), activation='relu'))
@@ -135,10 +135,10 @@ def predict(model, X, y):
  
 def saveModel(model):
     model_json = model.to_json()
-    with open(".././modelTensorflow/model1.json", "w") as json_file:
+    with open(".././modelTensorflow/model3.json", "w") as json_file:
         json.dump(model_json, json_file)
         # serialize weights to HDF5
-    model.save_weights(".././modelTensorflow/model1.h5")
+    model.save_weights(".././modelTensorflow/model3.h5")
 
 
 
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     model = build_model(input_shape)
 
     # compile model
-    optimiser = keras.optimizers.Adam(learning_rate=0.0001)
+    optimiser = keras.optimizers.Adam(learning_rate=0.000001)
     model.compile(optimizer=optimiser,
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     model.summary()
 
     # train model
-    history = model.fit(X_train, y_train, validation_data=(X_validation, y_validation), batch_size=32, epochs=4)
+    history = model.fit(X_train, y_train, validation_data=(X_validation, y_validation), batch_size=64, epochs=500)
     saveModel ( model ) 
     print ( " done " ) 
     # plot accuracy/error for training and validation

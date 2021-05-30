@@ -24,7 +24,7 @@ class runModel:
     def labels(self , predict):
         labels = ["Ok", "Silent", "Dislike", "Like", "Hi" , "hello" , "stop" , " "  ]
 
-        print (f"this state eye is : {labels[predict]}")
+        #print (f"this state eye is : {labels[predict]}")
         return labels[predict]
     
     def loadModel(self , JSON_FILE , WEIGHTS_FILE , model ):
@@ -68,9 +68,9 @@ class runModel:
     
         Model = self.loadModel(self.jsonFile , self.weightsFile , self.model )
         return Model 
-    def getResult( self , img , Model ) :
+    def getResult( self , img , Model , size = 50 ) :
         
-        result , acc = self.predictImage( img , Model)
+        result , acc = self.predictImage( img , Model, size )
         ben = self.labels ( result )
         return ben , acc  
     
