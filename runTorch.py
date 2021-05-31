@@ -2,15 +2,18 @@ import torch
 from torch.utils.data import DataLoader  
 from torch.utils.data import Dataset  
 import torchvision.transforms as transforms 
-import torch  
+from torch import nn  
 import cv2 
 from srcTorch.BEN_processingData import imageDataset, processingDataset 
 from srcTorch.BEN_modelCNN import CNN 
 import BEN_detectFinger as finger 
-import time 
+import time
+import numpy as np 
 ben = finger.handLandmarks()
 pTime = 0
 cTIme = 0
+
+labels  = ['Ok', 'Silent', 'Dislike', 'Like', 'Hi', 'Hello', 'Stop' , ' ' ]
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -21,25 +24,22 @@ numClasses = 7
 model = CNN (numClasses) 
 model.load_state_dict(torch.load(PATH))
 model.eval()
-#print ( model )
 
+print ( model )
 
-def predict(model, image ) : 
-
-
-    dataTransform = transforms.Compose([
+dataTransform = transforms.Compose([
     transforms.ToPILImage(),
     transforms.Resize(26),
     transforms.ToTensor()
     ])
-    
-    image = dataTransform ( img )
-    
-    image = image.reshape([1,1,26,26])
-    outputs = model ( image )  
-    _, predicted = torch.max( outputs.data ,1 )  
 
-video = 0 
+
+
+
+video = 4
+
+
+
 cap = cv2.VideoCapture(video )  
 predict = '' 
 acc = 0 
@@ -61,19 +61,23 @@ while True :
     pTime = cTime
     cv2.putText( img , f"Fps: {int(fps)}" , (6,50) , cv2.FONT_HERSHEY_PLAIN,2, (255, 0, 255 ) ,3 )
     if check and img2.size == 100*100 :
-        predict   = predict ( img2 ) 
-        print ( predict ) 
-        #if predict != False :
-        #    try:
-
-        #        cv2.putText( img , f"Status: {predict} {int(acc*100)} %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
-        #    except :
-
-        #        cv2.putText( img , f"Status:          %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
-        #else:
-        #    cv2.putText( img ,     f"Status:          %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
+        
+        img2 = np.array ( img2 )
+        image = dataTransform ( img2 )
+        image = image.reshape([1,1,26,26])
+        outputs = model ( image )
+        m = nn.Softmax(dim=1)
+        output = m( outputs ) 
+        _, predicted = torch.max( output.data ,1 )
+        predict = labels[predicted] 
+        acc = int( output.data[0][predicted]*100) 
+        
+        if acc > 75 :
+            cv2.putText( img , f"Pytorch: {predict} {acc} %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
+        else:
+            cv2.putText( img ,     f"Pytorch:          %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
     else :
-        cv2.putText( img ,         f"Status:          %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
+        cv2.putText( img ,         f"Pytorch:          %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
     cv2.imshow("image", img)
     if cv2.waitKey(1) == 27:
         break

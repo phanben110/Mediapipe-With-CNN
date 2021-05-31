@@ -42,14 +42,14 @@ while True :
         if predict != False :
             try:
 
-                cv2.putText( img , f"Status: {predict} {int(acc*100)} %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
+                cv2.putText( img , f"Tensorflow: {predict} {int(acc*100)} %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
             except : 
 
-                cv2.putText( img , f"Status:          %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
+                cv2.putText( img , f"Tensorflow:          %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
         else:
-            cv2.putText( img ,     f"Status:          %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
+            cv2.putText( img ,     f"Tensorflow:          %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
     else : 
-        cv2.putText( img ,         f"Status:          %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
+        cv2.putText( img ,         f"Tensorflow:          %" , (200,50) , cv2.FONT_HERSHEY_PLAIN,2, (0, 0, 255 ) ,3 )
     cv2.imshow("image", img)
     if cv2.waitKey(1) == 27:
         break
