@@ -9,7 +9,9 @@ import torchvision
 import torch 
 import cv2
 import pandas as pd 
-
+import itertools
+import numpy as np
+import matplotlib.pyplot as plt
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu") 
 
 class imageDataset( Dataset): 
@@ -66,8 +68,39 @@ class processingDataset () :
             df1['label'].value_counts().plot.bar()
             plt.show () 
 
+        return df
 
-        return df 
+class confusionMatrix(): 
+    def __init__(self) : 
+        pass 
+    def plot_confusion_matrix(self , cm, classes, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues , draw = True  ):
+        if normalize:
+            cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+            print("Normalized confusion matrix")
+        else:
+            print('Confusion matrix, without normalization')
+ 
+ 
+        print(cm)
+        plt.imshow(cm, interpolation='nearest', cmap=cmap)
+        plt.title(title)
+        plt.colorbar()
+        tick_marks = np.arange(len(classes))
+        plt.xticks(tick_marks, classes, rotation=45)
+        plt.yticks(tick_marks, classes)
+ 
+ 
+        fmt = '.2f' if normalize else 'd'
+        thresh = cm.max() / 2.
+        for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+            plt.text(j, i, format(cm[i, j], fmt), horizontalalignment="center", color="white" if cm[i, j] > thresh else "black")
+ 
+        if draw : 
+
+            plt.tight_layout()
+            plt.ylabel('True label')
+            plt.xlabel('Predicted label')
+            plt.show ()
 
 if __name__ == "__main__": 
     

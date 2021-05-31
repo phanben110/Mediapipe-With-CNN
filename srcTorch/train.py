@@ -12,7 +12,8 @@ import pandas as pd
 import time  
 
 from BEN_processingData import imageDataset 
-from BEN_processingData import processingDataset 
+from BEN_processingData import processingDataset
+from BEN_processingData import confusionMatrix 
 
 import BEN_modelCNN as model
 
@@ -25,7 +26,14 @@ inChannel = 1
 numClasses = 7
 learningRate = 0.001
 batchSize = 100
-numEpochs = 10
+numEpochs = 3
+
+
+import itertools
+import numpy as np
+import matplotlib.pyplot as plt
+
+
 
 dataTransform = transforms.Compose([
     transforms.ToPILImage(),
@@ -99,7 +107,47 @@ with torch.no_grad():
     print('Test Accuracy of the model on the 10000 test images: {} %'.format(100 * correct / total))
 
 # Save the model checkpoint
-torch.save(model.state_dict(), './../modelPytorch/model.pt')
+torch.save(model.state_dict(), './../modelPytorch/model1.pt')
 hour = ( time.time()  - beginTime ) / (60*60) 
 
-print ("training Done , total time during training is: {:.3f} h ".format(hour) ) 
+print ("training Done , total time during training is: {:.3f} h ".format(hour) )
+
+
+from sklearn.metrics import confusion_matrix
+
+nb_classes = 9
+
+# Initialize the prediction and label lists(tensors)
+predlist=torch.zeros(0,dtype=torch.long, device='cpu')
+lbllist=torch.zeros(0,dtype=torch.long, device='cpu')
+
+# that is print confusion matrix 
+
+with torch.no_grad():
+    for i, (inputs, classes) in enumerate(testLoader):
+        inputs = inputs.to(device)
+        classes = classes.to(device)
+        outputs = model(inputs)
+        _, preds = torch.max(outputs, 1)
+
+        # Append batch prediction results
+        predlist=torch.cat([predlist,preds.view(-1).cpu()])
+        lbllist=torch.cat([lbllist,classes.view(-1).cpu()])
+
+
+
+# Confusion matrix
+conf_mat=confusion_matrix(lbllist.numpy(), predlist.numpy())
+print(conf_mat)
+
+# Per-class accuracy
+class_accuracy=100*conf_mat.diagonal()/conf_mat.sum(1)
+print(class_accuracy)
+
+plt.figure(figsize=(7,7))
+
+#plot_confusion_matrix(conf_mat , testLoader.)
+
+
+conMax = confusionMatrix() 
+conMax.plot_confusion_matrix(conf_mat , ['Ok', 'Silent', 'Dislike', 'Like', 'Hi', 'Hello', 'Stop'])
