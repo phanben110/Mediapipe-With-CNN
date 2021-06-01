@@ -26,7 +26,7 @@ inChannel = 1
 numClasses = 7
 learningRate = 0.001
 batchSize = 100
-numEpochs = 3
+numEpochs = 1000
 
 
 import itertools
@@ -107,7 +107,7 @@ with torch.no_grad():
     print('Test Accuracy of the model on the 10000 test images: {} %'.format(100 * correct / total))
 
 # Save the model checkpoint
-torch.save(model.state_dict(), './../modelPytorch/model1.pt')
+torch.save(model.state_dict(), './../modelPytorch/model2.pt')
 hour = ( time.time()  - beginTime ) / (60*60) 
 
 print ("training Done , total time during training is: {:.3f} h ".format(hour) )

@@ -19,7 +19,7 @@ labels  = ['Ok', 'Silent', 'Dislike', 'Like', 'Hi', 'Hello', 'Stop' , ' ' ]
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-PATH = '/home/pcwork/ai/ftech/finger/CNN/modelPytorch/model.pt' 
+PATH = '/home/pcwork/ai/ftech/finger/CNN/modelPytorch/model2.pt' 
 numClasses = 7 
 model = CNN (numClasses) 
 model.load_state_dict(torch.load(PATH))
@@ -35,8 +35,10 @@ dataTransform = transforms.Compose([
 
 
 
-
-video = 4
+#video = 'rtsp://ftech:ad1235min@192.168.130.27/live0'
+video = 'rtsp://ftech:ad1235min@192.168.130.81/live0'
+#command line to scan IP ("nmap -sP 192.168.130.0/24") 
+video = 0
 
 
 
