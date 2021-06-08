@@ -40,7 +40,8 @@ if camera:
 
     #Define a source - color camera 
     cam_rbg = pipeline.createColorCamera()
-    cam_rbg.setVideoSize(640, 480 ) 
+    cam_rbg.setVideoSize(int(1920*(2/3)),int(1080*(2/3))) 
+    #cam_rbg.setVideoSize(640, 480) 
     cam_rbg.setBoardSocket( dai.CameraBoardSocket.RGB ) 
     cam_rbg.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P) 
     cam_rbg.setInterleaved(True)  
@@ -145,6 +146,7 @@ with dai.Device(pipeline) as device:
     counter = 0 
     label = ''
     conf = 0 
+    speedProcessing=[]
 
     while should_run(): 
         # Read image from video or camera 
@@ -154,11 +156,13 @@ with dai.Device(pipeline) as device:
         if not read_correctly:
             break
         
-        # processing to find point for each finger and, bouding box 
+        # prpocessing to find point for each finger and, bouding box 
+        timeH = time.time() 
         ben.showFinger( img )
         pointList, box  = ben.storePoint ( img )
         check , img1 , img2 = ben.drawAndResize( img , box )
         
+        h = time.time() - timeH 
         #Drawing bouding box for 1 hand ( hand is higher ) 
 
         if len ( box ) != 0 :
@@ -176,7 +180,6 @@ with dai.Device(pipeline) as device:
 
         #Check bouding box have hand or not 
         if check and img2.size == 100*100 :
-
             image = cv2.resize ( img2 , (26, 26))
             image = image.T
             image = np.reshape(image , [1,26,26,1])
@@ -193,19 +196,25 @@ with dai.Device(pipeline) as device:
             if in_nn is not None:
                 data = softmax(in_nn.getFirstLayerFp16())
                 result_conf = np.max(data) + 0.6881
-                if result_conf > 0.75:
+                if result_conf > 0.96:
                     label = labels[int ( np.argmax(data)) ]
-                    conf =  round(100 * result_conf, 2) 
+                    conf =  f"{round(100 * result_conf, 2)}%"  
+                    speedProcessing.append(h)  
                 else:
+                    conf = ''
+                    label ='' 
                     result = None
 
             if debug: 
                 pass 
                 # if the frame is available, draw bounding boxes on it and show the frame
-        
+        else: 
+            label = '' 
+            conf = ''  
         # imshow in screen 
-        cv2.putText( img , f"Fps: {int(fps)}, Status: {label} {conf}%" , (10,26) , cv2.FONT_HERSHEY_PLAIN,2, (255, 0, 255  ) ,thickness=3)
+        cv2.putText( img , f"Fps: {int(fps)}, Status: {label} {conf}" , (10,26) , cv2.FONT_HERSHEY_PLAIN,2, (255, 0, 255  ) ,thickness=3)
         cv2.imshow("rgb", img)
+        print ( np.average(speedProcessing)*1000) 
         if cv2.waitKey(1) == 27:
             break
 

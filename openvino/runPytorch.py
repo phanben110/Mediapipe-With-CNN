@@ -8,7 +8,7 @@ import numpy as np
 import BEN_detectFinger as finger  
 import time  
 import torchvision.transforms as transforms 
-
+import torch
 dataTransform = transforms.Compose([
     transforms.ToPILImage(), 
     transforms.Resize(26), 
@@ -22,7 +22,7 @@ cTime = 0
 labels  = ['Ok', 'Silent', 'Dislike', 'Like', 'Hi', 'Hello', 'Stop' , ' ' ]
 
 blobPath ='modelHandTorch2.blob'  
-
+blobPath ='/home/pcwork/ai/ftech/finger/CNN/modelPytorch/openvino/model5.blob' 
 parser = argparse.ArgumentParser()
 parser.add_argument('-nd', '--no-debug', action="store_true", help="Prevent debug output")
 parser.add_argument('-cam', '--camera', action="store_true", help="Use DepthAI 4K RGB camera for inference (conflicts with -vid)")
@@ -47,7 +47,8 @@ if camera:
 
     #Define a source - color camera 
     cam_rbg = pipeline.createColorCamera()
-    cam_rbg.setVideoSize(640, 480 ) 
+    #cam_rbg.setVideoSize(640, 480 ) 
+    cam_rbg.setVideoSize(1920, 1080 ) 
     cam_rbg.setBoardSocket( dai.CameraBoardSocket.RGB ) 
     cam_rbg.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P) 
     cam_rbg.setInterleaved(True)  
@@ -152,6 +153,7 @@ with dai.Device(pipeline) as device:
     counter = 0 
     label = ''
     conf = 0 
+    speedProcessing = [] 
 
     while should_run(): 
         # Read image from video or camera 
@@ -162,10 +164,12 @@ with dai.Device(pipeline) as device:
             break
         
         # processing to find point for each finger and, bouding box 
+        timeH = time.time() 
         ben.showFinger( img )
         pointList, box  = ben.storePoint ( img )
         check , img1 , img2 = ben.drawAndResize( img , box )
         
+        h = time.time() - timeH 
         #Drawing bouding box for 1 hand ( hand is higher ) 
 
         if len ( box ) != 0 :
@@ -183,10 +187,13 @@ with dai.Device(pipeline) as device:
 
         #Check bouding box have hand or not 
         if check and img2.size == 100*100 :
-            image = np.array(img2) 
-            image = dataTransform( image ) 
-            
-            image = np.reshape(image , [1,1,26,26])
+            #image = np.array(img2) 
+            #image = dataTransform( image )
+            image = cv2.resize(img2,(26,26))
+            image = image.T 
+            #image = torch.tensor ( image ) 
+
+            #image = np.reshape(image , [1,1,26,26])
             
             #put input into neural network 
             nn_data = dai.NNData()
@@ -200,20 +207,25 @@ with dai.Device(pipeline) as device:
             if in_nn is not None:
                 data = softmax(in_nn.getFirstLayerFp16())
                 result_conf = np.max(data) 
-                print ( data ) 
-                if result_conf > 0.75:
+                if result_conf > 0.95:
                     label = labels[int ( np.argmax(data)) ]
-                    conf =  round(100 * result_conf, 2) 
+                    conf =  f"{round(100 * result_conf, 2)}%"  
+                    speedProcessing.append(h) 
                 else:
-                    result = None
+                    label = '' 
+                    conf = '' 
 
             if debug: 
                 pass 
                 # if the frame is available, draw bounding boxes on it and show the frame
+        else :
+            label = '' 
+            conf = '' 
         
         # imshow in screen 
-        cv2.putText( img , f"Fps: {int(fps)}, Status: {label} {conf}%" , (10,26) , cv2.FONT_HERSHEY_PLAIN,2, (255, 0, 255  ) ,thickness=3)
-        cv2.imshow("rgb", img)
+        cv2.putText( img , f"Fps: {int(fps)}, Status: {label} {conf}" , (10,26) , cv2.FONT_HERSHEY_PLAIN,2, (255, 0, 255  ) ,thickness=3)
+        cv2.imshow("rgb", img) 
+        print ( np.average( speedProcessing )*1000 ) 
         if cv2.waitKey(1) == 27:
             break
 
