@@ -7,11 +7,11 @@ pTime = 0
 cTime = 0
 video ="handBen2.mp4"
 video = '/home/pcwork/ai/ftech/finger/DatasetToHandVitual/helloVideo/hello_01'
-video = '/home/pcwork/depthai-python/examples/vaytay.avi' 
+#video = '/home/pcwork/depthai-python/examples/vaytay.avi' 
 #video = 'rtsp://ftech:ad1235min@192.168.130.27/live0'
 #video = '/home/pcwork/ai/ftech/finger/CNN/quang/My video - Ngày (2).mp4' 
-video = 2
-name = "hi2" 
+video = 0
+name = "three" 
 cap = cv2.VideoCapture(video)
 try: 
     os.mkdir ("data") 
@@ -58,7 +58,7 @@ while True :
         count += 1
         #print ( f"data/{name}/{name}_{count}.jpg") 
     #if check  == True :
-    #    cv2.imshow("image", img2  )
+    cv2.imshow("image", img2  )
     #    cv2.imshow("ben1", img1)
     if cv2.waitKey(1) == 27:
         break
