@@ -7,7 +7,7 @@ from torch.utils.data import Dataset, TensorDataset
 import torchvision.transforms as transforms
 from processData import Dataset
 from sklearn.model_selection import train_test_split
-from modelCNN import CNN
+from BEN_modelCNN import CNN
 import numpy as np
 from PIL import Image
 import cv2
@@ -38,8 +38,8 @@ def imshow(data):
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 # Hyper parameters
-num_epochs = 5
-num_classes = 7
+num_epochs = 100
+num_classes = 12
 batch_size = 64
 learning_rate = 0.001
 
@@ -47,7 +47,7 @@ X_train, X_validation, X_test, y_train, y_validation, y_test = getTrainData(0.2,
 
 classes = dataset.data['mapping']
 print(classes)
-model = CNN().to(device)
+model = CNN(12).to(device)
 
 # Loss and optimizer
 criterion = nn.CrossEntropyLoss()
@@ -102,10 +102,12 @@ with torch.no_grad():
     output = model.forward(img)
     predict = torch.max(output, 1)[1]
     print(classes[predict.item()])
-PATH = 'model.pth'
-torch.save({
-            'epoch': num_epochs,
-            'model_state_dict': model.state_dict(),
-            'optimizer_state_dict': optimizer.state_dict(),
-            'loss': loss,
-            }, PATH)
+PATH = '../modelPytorch/model12Class.pt'
+torch.save(model.state_dict(), PATH ) 
+
+#torch.save({
+#            'epoch': num_epochs,
+#            'model_state_dict': model.state_dict(),
+#            'optimizer_state_dict': optimizer.state_dict(),
+#            'loss': loss,
+#            }, PATH)
