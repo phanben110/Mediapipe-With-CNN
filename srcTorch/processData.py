@@ -3,7 +3,7 @@ import os
 import json
 import numpy as np
 
-json_path = './../data/processed/dataHandSize26.json'
+json_path = './../data/processed/dataHand12ClassSize26V2.json'
 
 class Dataset():
     def __init__(self,data_path=json_path):
